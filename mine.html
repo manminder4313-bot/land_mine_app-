@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Minefield Design Calculator</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    margin:20px;
+}
+h2,h3{
+    background:#1f4e79;
+    color:white;
+    padding:8px;
+}
+.container{
+    background:white;
+    padding:15px;
+    border-radius:6px;
+    max-width:950px;
+}
+label{
+    display:block;
+    margin-top:8px;
+}
+input{
+    width:260px;
+    padding:6px;
+}
+button{
+    padding:10px 15px;
+    margin:12px 5px;
+    font-size:15px;
+    cursor:pointer;
+}
+.result{
+    background:#eef2f5;
+    padding:14px;
+    margin-top:12px;
+    border-radius:6px;
+    white-space:pre-line;
+    font-family: Consolas, monospace;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Minefield Design Calculator</h2>
+
+<div class="container">
+
+<h3>INPUT VALUES</h3>
+
+<label>Frontage (m)</label>
+<input id="frontage" type="number">
+
+<label>Depth (m)</label>
+<input id="depth" type="number">
+
+<label>Anti-Personnel Density</label>
+<input id="apDensity" type="number">
+
+<label>Anti-Tank Density</label>
+<input id="atDensity" type="number">
+
+<label>Fragmentation Density</label>
+<input id="fragDensity" type="number">
+
+<label>ALD %</label>
+<input id="ald" type="number">
+
+<label>Trip Flare %</label>
+<input id="trip" type="number">
+
+<label>VSL</label>
+<input id="vsl" type="number">
+
+<label>ISL</label>
+<input id="isl" type="number">
+
+<br>
+
+<button onclick="calculate()">Calculate</button>
+<button onclick="clearAll()">Clear</button>
+<button onclick="example()">Example</button>
+
+<h3>OUTPUT</h3>
+<div id="output" class="result"></div>
+
+</div>
+
+<script>
+function calculate(){
+
+    /* INPUTS */
+    let F = Number(frontage.value);
+    let D = Number(depth.value);
+    let APd = Number(apDensity.value);
+    let ATd = Number(atDensity.value);
+    let FRd = Number(fragDensity.value);
+    let ALD = Number(ald.value) / 100;
+    let TRIP = Number(trip.value) / 100;
+    let VSL = Number(vsl.value);
+    let ISL = Number(isl.value);
+
+    let lanes = VSL + ISL;
+    let perimeter = 2 * (F + D);
+
+    /* STRIPS */
+    let apStrips = APd;
+    let fragStrips = FRd / (1/12);
+    let totalStrips = apStrips + fragStrips;
+
+    /* MINES (+10%) */
+    let apMines = F * APd * 1.10;
+    let atMines = F * ATd * 1.10;
+    let fragMines = F * FRd * 1.10;
+    let totalMines = apMines + atMines + fragMines;
+
+    /* STORES */
+    let laip = (perimeter / 12.5) * 1.10;
+    let barbedWire = perimeter * 2 * 1.10;
+    let triangle = (perimeter / 50) * 1.10;
+    let bindingWire = triangle * 0.15;
+
+    let markedTape = (F * (totalStrips + 1)) * 1.10;
+    let saip = (F * 4 / 150 * totalStrips) * 1.10;
+    let unmarkedTape = ((totalStrips - 1) * F) * 1.10;
+    let unmarkedTapeLanes = (ISL * D + VSL * 2 * D) * 1.10;
+    let saipLanes = unmarkedTapeLanes / 20;
+
+    let tapingPin = markedTape/20;
+    let signalCable = (ISL * D + VSL * 2 * D) * 1.10;
+    let nightSignBoard = totalStrips * 2;
+
+    /* NAVIGATION STORES */
+    let guideTape = D + 200;
+    let returnGuide = D + 200 + F;
+    let saipUnmarkedTape = (unmarkedTape + guideTape + returnGuide) / 50;
+
+    /* ALD & TRIP FLARE */
+    let aldStore = atMines * ALD;
+    let tripFlare = F * TRIP;
+
+    /* TRANSPORT */
+    let apVehicles = apMines / 6400;
+    let atVehicles = atMines / 180;
+    let fragVehicles = fragMines / 560;
+    let perimeterVehicles = perimeter / 3000;
+    let storesVehicles = 2;
+    let totalVehicle = apVehicles + atVehicles + fragVehicles + perimeterVehicles + storesVehicles;
+
+    /* TIME PLAN */
+    let time = totalMines / 700;
+
+    document.getElementById("output").innerText =
+`FINAL SUMMARY
+
+Strips
+
+(a) No of Strips
+    (i) A, B, C : ${apStrips.toFixed(2)}
+    (ii) D, E, F: ${fragStrips.toFixed(2)}
+
+Mines
+ 
+(b) No of Mines
+    (i) A/Pers : ${apMines.toFixed(0)}
+    (ii) A/Tk  : ${atMines.toFixed(0)}
+    (iii) Frag : ${fragMines.toFixed(0)}
+
+Marking Stores 
+
+(c) Perimeter             : ${perimeter.toFixed(2)} m
+(d) LAIP                  : ${laip.toFixed(2)}
+(e) Barbed Wire           : ${barbedWire.toFixed(2)}
+(f) Perimeter Sign        : ${triangle.toFixed(2)}
+(g) Binding Wire (m)      : ${bindingWire.toFixed(2)}
+
+Setting out stores
+
+(h) Marked Tape (m)   : ${markedTape.toFixed(2)}
+(i) Taping Pin            : ${tapingPin.toFixed(0)}
+(j) SAIP                  : ${saip.toFixed(2)}
+
+NAVIGATION STORES
+
+(k) Unmarked Tape         : ${unmarkedTape.toFixed(2)}
+(l) Guide Tape            : ${guideTape.toFixed(2)}
+(m) Return Guide Tape     : ${returnGuide.toFixed(2)}
+(n) SAIP (Unmarked Tape)  : ${saipUnmarkedTape.toFixed(2)}
+(o) Night Sign Board      : ${nightSignBoard}
+
+
+STORE FOR(ISL/VSL)
+
+(p) Unmarked Tape (ISL/VSL) : ${unmarkedTapeLanes.toFixed(2)}
+(q) SAIP (ISL/VSL)        : ${saipLanes.toFixed(2)}
+(r) Signal Cable          : ${signalCable.toFixed(2)}
+
+
+ALD & TRIP FLARE
+
+(s) ALD                   : ${aldStore.toFixed(2)}
+(t) Trip Flare            : ${tripFlare.toFixed(2)}
+
+
+TRANSPORT
+
+(u) A/Pers Mines Vehicles : ${apVehicles.toFixed(2)}
+(v) A/Tk Mines Vehicles   : ${atVehicles.toFixed(2)}
+(w) Frag Mines Vehicles   : ${fragVehicles.toFixed(2)}
+(x) Perimeter Vehicles    : ${perimeterVehicles.toFixed(2)}
+(y) Stores Vehicles       : ${storesVehicles.toFixed(2)}
+(z) Total Transportation  : ${totalVehicle.toFixed(2)} Vehicles
+
+Time plan
+
+(aa) Time Plan            : ${time.toFixed(2)} days
+
+`;
+}
+
+function clearAll(){
+    document.querySelectorAll("input").forEach(i=>i.value="");
+    output.innerText="";
+}
+
+function example(){
+    frontage.value = 1000;
+    depth.value = 800;
+    apDensity.value = 3;
+    atDensity.value = 2;
+    fragDensity.value = 0.25;
+    ald.value = 10;
+    trip.value = 5;
+    vsl.value = 1;
+    isl.value = 2;
+}
+</script>
+
+</body>
+</html>
