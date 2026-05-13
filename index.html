@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minefield Design Calculator | Professional</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #fbbf24;
+            --accent-hover: #f59e0b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 2.5rem;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            padding: 2.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 850px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        section h2::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+
+        .actions {
+            grid-column: span 2;
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .actions { grid-column: span 1; flex-direction: column; }
+        }
+
+        button {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .output-panel {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        #output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            white-space: pre;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3rem 0;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #334155;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .copy-btn:hover { opacity: 1; }
+
+        footer {
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>MINEFIELD CALCULATOR</h1>
+            <p>High-precision military engineering tool for field planning</p>
+        </header>
+
+        <main class="content">
+            <section class="input-section">
+                <h2>Parameters</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Frontage (m)</label>
+                        <input id="frontage" type="number" placeholder="1000">
+                    </div>
+                    <div class="input-group">
+                        <label>Depth (m)</label>
+                        <input id="depth" type="number" placeholder="800">
+                    </div>
+                    <div class="input-group">
+                        <label>AP Density</label>
+                        <input id="apDensity" type="number" placeholder="3">
+                    </div>
+                    <div class="input-group">
+                        <label>AT Density</label>
+                        <input id="atDensity" type="number" placeholder="2">
+                    </div>
+                    <div class="input-group">
+                        <label>Frag Density</label>
+                        <input id="fragDensity" type="number" placeholder="0.25">
+                    </div>
+                    <div class="input-group">
+                        <label>ALD %</label>
+                        <input id="ald" type="number" placeholder="10">
+                    </div>
+                    <div class="input-group">
+                        <label>Trip Flare %</label>
+                        <input id="trip" type="number" placeholder="5">
+                    </div>
+                    <div class="input-group">
+                        <label>VSL</label>
+                        <input id="vsl" type="number" placeholder="1">
+                    </div>
+                    <div class="input-group">
+                        <label>ISL</label>
+                        <input id="isl" type="number" placeholder="2">
+                    </div>
+                    <div class="actions">
+                        <button class="btn-primary" onclick="calculate()">Calculate Now</button>
+                        <button class="btn-secondary" onclick="example()">Example</button>
+                        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="output-section">
+                <h2>Calculation Results</h2>
+                <div class="output-panel">
+                    <div id="output"><div class="empty-state">Results will appear here after calculation...</div></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            &copy; 2026 Minefield Engineering Tool. Designed for rapid field assessment.
+        </footer>
+    </div>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    console.log('SW registered.');
+                }).catch(err => {
+                    console.log('SW registration failed:', err);
+                });
+            });
+        }
+
+        function calculate() {
+            const inputs = {
+                F: Number(document.getElementById('frontage').value),
+                D: Number(document.getElementById('depth').value),
+                APd: Number(document.getElementById('apDensity').value),
+                ATd: Number(document.getElementById('atDensity').value),
+                FRd: Number(document.getElementById('fragDensity').value),
+                ALD: Number(document.getElementById('ald').value) / 100,
+                TRIP: Number(document.getElementById('trip').value) / 100,
+                VSL: Number(document.getElementById('vsl').value),
+                ISL: Number(document.getElementById('isl').value)
+            };
+
+            if (!inputs.F || !inputs.D) {
+                alert("Please enter at least Frontage and Depth.");
+                return;
+            }
+
+            const lanes = inputs.VSL + inputs.ISL;
+            const perimeter = 2 * (inputs.F + inputs.D);
+
+            const apStrips = inputs.APd;
+            const fragStrips = inputs.FRd / (1/12);
+            const totalStrips = apStrips + fragStrips;
+
+            const apMines = inputs.F * inputs.APd * 1.10;
+            const atMines = inputs.F * inputs.ATd * 1.10;
+            const fragMines = inputs.F * inputs.FRd * 1.10;
+            const totalMines = apMines + atMines + fragMines;
+
+            const laip = (perimeter / 12.5) * 1.10;
+            const barbedWire = perimeter * 2 * 1.10;
+            const triangle = (perimeter / 50) * 1.10;
+            const bindingWire = triangle * 0.15;
+
+            const markedTape = (inputs.F * (totalStrips + 1)) * 1.10;
+            const saip = (inputs.F * 4 / 150 * totalStrips) * 1.10;
+            const unmarkedTape = ((totalStrips - 1) * inputs.F) * 1.10;
+            const unmarkedTapeLanes = (inputs.ISL * inputs.D + inputs.VSL * 2 * inputs.D) * 1.10;
+            const saipLanes = unmarkedTapeLanes / 20;
+
+            const tapingPin = markedTape / 20;
+            const signalCable = (inputs.ISL * inputs.D + inputs.VSL * 2 * inputs.D) * 1.10;
+            const nightSignBoard = totalStrips * 2;
+
+            const guideTape = inputs.D + 200;
+            const returnGuide = inputs.D + 200 + inputs.F;
+            const saipUnmarkedTape = (unmarkedTape + guideTape + returnGuide) / 50;
+
+            const aldStore = atMines * inputs.ALD;
+            const tripFlare = inputs.F * inputs.TRIP;
+
+            const apVehicles = apMines / 6400;
+            const atVehicles = atMines / 180;
+            const fragVehicles = fragMines / 560;
+            const perimeterVehicles = perimeter / 3000;
+            const storesVehicles = 2;
+            const totalVehicle = apVehicles + atVehicles + fragVehicles + perimeterVehicles + storesVehicles;
+
+            const time = totalMines / 700;
+
+            const resultHTML = `
+<b style="color:var(--accent)">1. STRIPS</b>
+   A, B, C    : ${apStrips.toFixed(2)}
+   D, E, F    : ${fragStrips.toFixed(2)}
+   Total      : ${totalStrips.toFixed(2)}
+
+<b style="color:var(--accent)">2. MINES (+10% Res)</b>
+   A/Pers     : ${apMines.toFixed(0)}
+   A/Tk       : ${atMines.toFixed(0)}
+   Frag       : ${fragMines.toFixed(0)}
+   Total      : ${totalMines.toFixed(0)}
+
+<b style="color:var(--accent)">3. MARKING STORES</b>
+   Perimeter  : ${perimeter.toFixed(2)} m
+   LAIP       : ${laip.toFixed(2)}
+   Barbed Wire: ${barbedWire.toFixed(2)}
+   Signs      : ${triangle.toFixed(2)}
+   Bind Wire  : ${bindingWire.toFixed(2)} m
+
+<b style="color:var(--accent)">4. SETTING OUT</b>
+   Marked Tape: ${markedTape.toFixed(2)} m
+   Taping Pin : ${tapingPin.toFixed(0)}
+   SAIP       : ${saip.toFixed(2)}
+
+<b style="color:var(--accent)">5. NAVIGATION</b>
+   Unmark Tape: ${unmarkedTape.toFixed(2)} m
+   Guide Tape : ${guideTape.toFixed(2)} m
+   Ret Guide  : ${returnGuide.toFixed(2)} m
+   SAIP (UMT) : ${saipUnmarkedTape.toFixed(2)}
+   Night Board: ${nightSignBoard}
+
+<b style="color:var(--accent)">6. ISL / VSL</b>
+   Tape (Lanes): ${unmarkedTapeLanes.toFixed(2)} m
+   SAIP (Lanes): ${saipLanes.toFixed(2)}
+   Sig Cable  : ${signalCable.toFixed(2)} m
+
+<b style="color:var(--accent)">7. ALD & FLARES</b>
+   ALD Stores : ${aldStore.toFixed(2)}
+   Trip Flare : ${tripFlare.toFixed(2)}
+
+<b style="color:var(--accent)">8. LOGISTICS</b>
+   Total Veh  : <span style="color:var(--success)">${totalVehicle.toFixed(2)} Vehicles</span>
+   Est. Time  : <span style="color:var(--success)">${time.toFixed(2)} Days</span>
+`;
+            document.getElementById("output").innerHTML = resultHTML;
+        }
+
+        function clearAll() {
+            document.querySelectorAll("input").forEach(i => i.value = "");
+            document.getElementById("output").innerHTML = '<div class="empty-state">Results will appear here after calculation...</div>';
+        }
+
+        function example() {
+            document.getElementById('frontage').value = 1000;
+            document.getElementById('depth').value = 800;
+            document.getElementById('apDensity').value = 3;
+            document.getElementById('atDensity').value = 2;
+            document.getElementById('fragDensity').value = 0.25;
+            document.getElementById('ald').value = 10;
+            document.getElementById('trip').value = 5;
+            document.getElementById('vsl').value = 1;
+            document.getElementById('isl').value = 2;
+            calculate();
+        }
+    </script>
+</body>
+</html>
